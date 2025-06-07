@@ -1,0 +1,14 @@
+[project]
+name = "carsnbids-scraper"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "boto3>=1.38.32",
+    "pandas>=2.3.0",
+    "python-json-logger>=3.3.0",
+    "requests>=2.32.3",
+    "selenium>=4.33.0",
+    "webdriver-manager>=4.0.2",
+]

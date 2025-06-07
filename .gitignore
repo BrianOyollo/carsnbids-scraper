@@ -8,3 +8,22 @@ __pycache__
 /patch1
 /title_bug_fix
 
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+
+*.notes
+*.ipynb
+*.json
+*.csv
+*.txt
+*.db
+
