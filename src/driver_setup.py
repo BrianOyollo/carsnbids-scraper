@@ -6,11 +6,13 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
+from fake_useragent import UserAgent
 import time
 
 
 from logger import setup_json_logger
 logger = setup_json_logger()
+ua = UserAgent()
 
 
 def setup_driver():
@@ -20,9 +22,7 @@ def setup_driver():
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--window-size=1920,1080")
-    options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                         "AppleWebKit/537.36 (KHTML, like Gecko) "
-                         "Chrome/87.0.4280.88 Safari/537.36")
+    options.add_argument(f"user-agent={ua}")
 
     driver = webdriver.Chrome(
         service=ChromeService(ChromeDriverManager().install()),

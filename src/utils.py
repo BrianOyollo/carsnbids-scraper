@@ -57,7 +57,6 @@ def insert_urls(cursor, urls: list):
         urls_data
     )
     inserted = cursor.rowcount
-    logger.info(f"Insered {inserted} urls")
     return inserted  # Number of rows successfully inserted
 
 

@@ -22,9 +22,9 @@ def wait_for_pagination(driver, timeout:int=10):
         WebDriverWait(driver, timeout).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, ".paginator"))
         )
-        logger.info("✅ Pagination loaded (auctions likely loaded).")
+        logger.info("Pagination loaded (auctions likely loaded).")
     except TimeoutException:
-        logger.error("⚠️ Pagination not found. Proceeding anyway...")
+        logger.error("Pagination not found. Proceeding anyway...")
 
 
 def extract_auction_urls(driver, max_pages:int, timeout:int=60*5):
@@ -57,14 +57,14 @@ def extract_auction_urls(driver, max_pages:int, timeout:int=60*5):
             # extract urls from  current page
             auction_links = driver.find_elements(By.CSS_SELECTOR, ".auction-item .auction-title a[href]")
             auction_urls.extend([link.get_attribute("href") for link in auction_links])
-            logger.info(f"✅ Added {len(auction_links)} URLs (Total: {len(auction_urls)})")
+            logger.info(f"Added {len(auction_links)} URLs (Total: {len(auction_urls)})")
 
 
         except TimeoutException:
-            logger.info("❌ No auctions found on page.")
+            logger.info("No auctions found on page.")
             break
         except Exception as e:
-            logger.error(f"❌ Error scraping auction urls: {e}")
+            logger.error(f"Error scraping auction urls: {e}")
             break
 
         # check if it has scraped max_pages
@@ -79,15 +79,15 @@ def extract_auction_urls(driver, max_pages:int, timeout:int=60*5):
             )
             next_button.click()
             current_page += 1
-            time.sleep(5)
+            time.sleep(10)
         except TimeoutException:
-            logger.warning("⚠️ No more pages (or pagination button not clickable).")
+            logger.warning("No more pages (or pagination button not clickable).")
             break
         except NoSuchElementException:
-            logger.error("⚠️ 'Next' button not found.")
+            logger.error("'Next' button not found.")
             break
         except Exception as e:
-            logger.error(f"❌ Error navigating to next page: {e}")
+            logger.error(f"Error navigating to next page: {e}")
             break
 
 
