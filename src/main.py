@@ -34,6 +34,7 @@ def run_scraper():
         - Uploads auction data to S3
         - Commits DB changes only if upload is successful
         - Closes all resources cleanly
+        - Sends notification to phone using ntfy (https://ntfy.sh/)
     """
     try:
         # setup driver
@@ -66,9 +67,7 @@ def run_scraper():
             try:
                 logger.info(f'Scraping url: {url}')
                 start_time = time.time()
-                auction_data = scrape_auction.Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                         "AppleWebKit/537.36 (KHTML, like Gecko) "
-                         "Chrome/87.0.4280.88 Safari/537.36scrape_auction_data(driver,url)
+                auction_data = scrape_auction.scrape_auction_data(driver,url)
                 logger.info(f"Auction scraping completed in {(time.time() - start_time)} seconds")
                 auctions_data.append(auction_data)
                 successful_urls.append(url)
@@ -90,9 +89,7 @@ def run_scraper():
             logger.info(f"Scraped urls: {len(daily_urls)}")
             logger.info(f"New urls: {len(new_urls)}")
             logger.info(f"Successfully scraped urls: {len(new_urls)}")
-            logger.info(f"URLs inserted into dbMozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                         "AppleWebKit/537.36 (KHTML, like Gecko) "
-                         "Chrome/87.0.4280.88 Safari/537.36: {inserted_rows}")
+            logger.info(f"URLs inserted into db: {inserted_rows}")
 
             # ntfy msg
             ntfy_message = f"""
@@ -104,7 +101,7 @@ def run_scraper():
             """
         else:
             logger.warning("Upload failed. New urls will not be saved in the db")
-            ntfy_message = f"Uploaed to s3 failed"
+            ntfy_message = f"Upload to s3 failed"
 
     except Exception as e:
         logger.error(f"Error in scraping pipeline: {e}", exc_info=True)
