@@ -26,4 +26,5 @@ wheels/
 *.csv
 *.txt
 *.db
-download_objects.py
+/src/download_objects.py
+/src/start_ec2.py
