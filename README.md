@@ -1,6 +1,6 @@
 # CarsnBids_scraper
 
-carsnbids_scraper** is part of a larger data engineering project that **collects, processes, and stores car auction data** from the [Cars & Bids](https://carsandbids.com) website.
+**carsnbids_scraper** is part of a larger data engineering project that **collects, processes, and stores car auction data** from the [Cars & Bids](https://carsandbids.com) website.
 
 The overall goal of this project is to **practice and showcase real-world data engineering skills**, including scraping, cloud storage, pipeline orchestration, and data warehousing — all using open tools and best practice
 
