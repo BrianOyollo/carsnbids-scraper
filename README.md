@@ -1,8 +1,8 @@
 # CarsnBids_scraper
 
-**carsnbids_scraper** is a component of a data engineering pipeline that scrapes vehicle auction data from [carsandbids.com](https://carsandbids.com), stores the raw data in Amazon S3, and tracks progress using a local SQLite database. It sends phone notifications via [ntfy.sh](https://ntfy.sh) and is built using [uv](https://github.com/astral-sh/uv) for fast dependency and environment management.
+carsnbids_scraper** is part of a larger data engineering project that **collects, processes, and stores car auction data** from the [Cars & Bids](https://carsandbids.com) website.
 
-This scraper is designed to run automatically on an AWS EC2 instance.
+The overall goal of this project is to **practice and showcase real-world data engineering skills**, including scraping, cloud storage, pipeline orchestration, and data warehousing — all using open tools and best practice
 
 ## 📌 Project Structure
 
