@@ -8,11 +8,14 @@ from datetime import datetime
 import os
 import json
 
-
 from driver_setup import close_promo_bar
+from logger import setup_json_logger
+
+logger = setup_json_logger()
 
 
-def scrape_auction_data(driver, url:str, timeout:int = 30) -> dict:
+
+def scrape_auction_data(driver, url:str, timeout:int = 60) -> dict:
     """
     Scrapes detailed information from a single auction page.
     
@@ -186,10 +189,9 @@ def scrape_auction_data(driver, url:str, timeout:int = 30) -> dict:
                     auction_data['auction_quick_facts']['Seller Type'] = dd.text.strip()
 
         except NoSuchElementException:
-            print('Auction quick facts not found')
+            logger.warning('Auction quick facts not found')
         except Exception as e:
-            print(e)
-            pass
+            logger.Warning(e)
 
         # Extract Doug's Take
         try:
@@ -198,6 +200,8 @@ def scrape_auction_data(driver, url:str, timeout:int = 30) -> dict:
                 By.CSS_SELECTOR, ".detail-body p").text.strip()
         except NoSuchElementException:
             print("Doug's take not found")
+        except Exception as e:
+            logger.Warning(e)
 
         # Extract Highlights
         try:
@@ -209,7 +213,10 @@ def scrape_auction_data(driver, url:str, timeout:int = 30) -> dict:
                 auction_data['auction_highlights']['description'] = highlights_body.find_element(
                     By.CSS_SELECTOR, "p").text.strip()
             except NoSuchElementException:
-                pass
+                logger.warning('Auction hightlights not found')
+            except Exception as e:
+                logger.warning(f'Error: {e}')
+                
             
             # Get bullet points
             bullet_points = highlights_body.find_elements(By.CSS_SELECTOR, "ul li")
@@ -219,7 +226,9 @@ def scrape_auction_data(driver, url:str, timeout:int = 30) -> dict:
             ]
 
         except NoSuchElementException:
-            print('Auction highlights not found')
+            logger.warning('Auction highlights not found')
+        except Exception as e:
+            logger.Warning(e)
 
         # Extract Known Flaws
         try:
@@ -227,7 +236,9 @@ def scrape_auction_data(driver, url:str, timeout:int = 30) -> dict:
             flaws_items = flaws_section.find_elements(By.CSS_SELECTOR, ".detail-body li")
             auction_data['known_flaws'] = [item.text.strip() for item in flaws_items]
         except NoSuchElementException:
-            print('Known flaws not found')
+            logger.warning('Known flaws not found')
+        except Exception as e:
+            logger.Warning(e)
 
 
         # Extract Service History
@@ -238,7 +249,9 @@ def scrape_auction_data(driver, url:str, timeout:int = 30) -> dict:
             service_items = service_section.find_elements(By.CSS_SELECTOR, ".detail-body li")
             auction_data['service_history']['items'] = [item.text.strip() for item in service_items]
         except NoSuchElementException:
-            print('Service History not found')
+            logger.warning('Service History not found')
+        except Exception as e:
+            logger.Warning(e)
 
          # Extract Included Items
         try:
@@ -246,7 +259,9 @@ def scrape_auction_data(driver, url:str, timeout:int = 30) -> dict:
             included_items = items_section.find_elements(By.CSS_SELECTOR, ".detail-body li")
             auction_data['included_items'] = [item.text.strip() for item in included_items]
         except NoSuchElementException:
-            print("Included items not found")
+            logger.warning("Included items not found")
+        except Exception as e:
+            logger.Warning(e)
 
         # Extract Ownership History
         try:
@@ -254,7 +269,9 @@ def scrape_auction_data(driver, url:str, timeout:int = 30) -> dict:
             auction_data['ownership_history'] = history_section.find_element(
                 By.CSS_SELECTOR, ".detail-body p").text.strip()
         except NoSuchElementException:
-            print('Ownership history not found')
+            logger.warning('Ownership history not found')
+        except Exception as e:
+            logger.Warning(e)
 
         # Extract Seller Notes
         try:
@@ -262,7 +279,9 @@ def scrape_auction_data(driver, url:str, timeout:int = 30) -> dict:
             notes_items = notes_section.find_elements(By.CSS_SELECTOR, ".detail-body li")
             auction_data['seller_notes'] = [item.text.strip() for item in notes_items]
         except NoSuchElementException:
-            print('Seller notes not found')
+            logger.warning('Seller notes not found')
+        except Exception as e:
+            logger.Warning(e)
         
         # Extract Video Links
         try:
@@ -274,7 +293,9 @@ def scrape_auction_data(driver, url:str, timeout:int = 30) -> dict:
                 if 'ytimg.com' in img.get_attribute("src")
             ]
         except NoSuchElementException:
-            print('Auction videos not found')
+            logger.warning('Auction videos not found')
+        except Exception as e:
+            logger.Warning(e)
 
         # bids
         try:
@@ -291,8 +312,10 @@ def scrape_auction_data(driver, url:str, timeout:int = 30) -> dict:
                 driver.execute_script("arguments[0].click();", bid_button)
                 time.sleep(2)  # Allow bids to load
             except Exception as e:
-                print(f"Couldn't click bid history button: {str(e)}")
+                logger.warning(f"Couldn't click bid history button: {str(e)}")
                 return auction_data
+            except Exception as e:
+                logger.Warning(e)
 
             # Extract bid history
             bids = []
@@ -310,16 +333,16 @@ def scrape_auction_data(driver, url:str, timeout:int = 30) -> dict:
                     # }
                    
                 except Exception as e:
-                    print(f"Error parsing bid: {str(e)}")
+                    logger.warning(f"Error parsing bid: {str(e)}")
                     continue
             auction_data['auction_stats']['bids']=bids
 
         except Exception as e:
-            print(f"Error scraping bid history: {str(e)}")
+            logger.warning(f"Error scraping bid history: {str(e)}")
 
     except TimeoutException:
-        print(f"Timeout while scraping {url}")
+        logger.warning(f"Timeout while scraping {url}")
     except Exception as e:
-        print(f"Error scraping {url}: {str(e)}")
+        logger.warning(f"Error scraping {url}: {str(e)}")
     
     return auction_data

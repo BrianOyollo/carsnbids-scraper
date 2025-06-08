@@ -9,6 +9,9 @@ from selenium.common.exceptions import TimeoutException
 import time
 
 
+from logger import setup_json_logger
+logger = setup_json_logger()
+
 
 def setup_driver():
     options = Options()
@@ -35,12 +38,13 @@ def close_promo_bar(driver, timeout=10):
             EC.element_to_be_clickable((By.CSS_SELECTOR, ".promo-bar.new-seller .rb.close.dismiss"))
         )
         close_button.click()
-        print("Promo bar closed successfully.")
+        logger.info("Promo bar closed successfully.")
     except TimeoutException:
-        print("Promo bar close button not found or not clickable within timeout.")
+        logger.warning("Promo bar close button not found or not clickable within timeout.")
     except Exception as e:
-        print(f"Error closing promo bar: {e}")
+        logger.error(f"Error closing promo bar: {e}")
 
 
 def driver_teardown(driver):
+    logger.info("Closing webdriver")
     driver.quit()

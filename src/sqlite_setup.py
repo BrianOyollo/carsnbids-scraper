@@ -10,7 +10,7 @@ logger = setup_json_logger()
 db_path = os.getenv('SQLITE_DB_PATH')
 
 
-def init_db(db_path=None):
+def init_db(db_path:str=None):
     if not db_path:
         db_path = 'carsnbids.db'
 

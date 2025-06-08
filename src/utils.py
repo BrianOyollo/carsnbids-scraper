@@ -4,15 +4,14 @@ import pandas as pd
 from dotenv import load_dotenv
 import sqlite3
 import csv
+import json
+import boto3
 
 from logger import setup_json_logger
 
 load_dotenv()
 logger = setup_json_logger()
 
-uls_file_path = os.getenv('URLS_FILE_PATH')
-filter_duration = os.getenv('URLS_FILTER_DURATION')
-db_path = os.getenv('SQLITE_DB_PATH')
 
 def db_connection(db_path:str=None):
     if not db_path:
@@ -57,8 +56,9 @@ def insert_urls(cursor, urls: list):
         "INSERT INTO urls(auction_id, url) VALUES(:auction_id, :url) ON CONFLICT(auction_id) DO NOTHING",
         urls_data
     )
-
-    return cursor.rowcount  # Number of rows successfully inserted
+    inserted = cursor.rowcount
+    logger.info(f"Insered {inserted} urls")
+    return inserted  # Number of rows successfully inserted
 
 
 def filter_urls(cursor, urls:list)->list:
@@ -98,9 +98,40 @@ def filter_urls(cursor, urls:list)->list:
     existing_urls = cursor.fetchall()
     existing_ids = {row[0] for row in existing_urls}
     new_urls = [auctions[id] for id in auction_ids if id not in existing_ids]
-    logger.info(f"{len(new_urls)} new urls found")
 
     return new_urls
+
+
+
+def upload_to_s3(auction_data:list, bucket):
+    """
+    Uploads auction data to an S3 bucket as a JSON file.
+
+    Args:
+        auction_data (list): List of auction dictionaries to upload.
+        bucket (str): Name of the target S3 bucket.
+
+    The file will be named using the format: 'auctions_<prev_date>.json',
+    where <prev_date> is the previous day's date in YYYY-MM-DD format.
+    """
+
+    prev_date = datetime.now().date() - timedelta(days=1)
+    key = f"auctions_{prev_date}.json"
+
+    json_data = json.dumps(auction_data, indent=3)
+    try:
+        logger.info('Uploading auctions to s3')
+        s3 = boto3.client("s3")
+        s3.put_object(Bucket=bucket,Key=key, Body=json_data)
+        return True
+    except Exception as e:
+        logger.error(f"Error uploading auctions to s3 bucket: {e}")
+
+
+    
+
+
+    
         
 
     
