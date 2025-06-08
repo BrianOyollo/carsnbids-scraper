@@ -52,9 +52,7 @@ carsnbids_scraper/
 
 ### Prerequisites
 
-- Python 3.13+
-  
-- [uv]([Installation | uv](https://docs.astral.sh/uv/getting-started/installation/#standalone-installer)) installed (install via `pipx` or directly):
+- [uv](https://docs.astral.sh/uv/getting-started/installation/#standalone-installer) installed (install via `pipx` or directly):
   
 
 ### 1. Clone the repository
