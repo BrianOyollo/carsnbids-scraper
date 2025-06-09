@@ -6,11 +6,14 @@ import sqlite3
 import csv
 import json
 import boto3
+import argparse
 
 from logger import setup_json_logger
 
 load_dotenv()
 logger = setup_json_logger()
+
+sqlite_db_path = os.getenv('SQLITE_DB_PATH')
 
 
 def db_connection(db_path:str=None):
@@ -127,10 +130,48 @@ def upload_to_s3(auction_data:list, bucket):
         logger.error(f"Error uploading auctions to s3 bucket: {e}")
 
 
+def export_db_urls_to_csv(file_path:str='auction_urls.csv'):
+    """Exports all auction URLs from SQLite database to a CSV file.
     
+    Retrieves URLs and their scrape timestamps from the database, then writes them
+    to a CSV file with columns: ['url', 'scraped_at'].
+
+    Args:
+        file_path (str, optional): Output CSV file path. Defaults to 'auction_urls.csv'.
+    
+    Returns:
+        None: Output is written to the specified CSV file.
+    
+    Raises:
+        Exception: Propagates any database or file I/O errors with full stack trace.
+    
+    Notes:
+        - Overwrites existing file
+    """
+    try:
+        logger.info("Exporting auction urls to csv file")
+
+        conn,cursor = db_connection(sqlite_db_path)
+
+        logger.info("Querying db for urls")
+        query = "SELECT url,scraped_at FROM urls"
+        results = cursor.execute(query).fetchall()
+
+        logger.info("Exporting urls to csv file")
+        with open(f"{file_path}", "w") as file:
+            csvwriter = csv.writer(file)
+            csvwriter.writerow(['url','scraped_at'])
+            csvwriter.writerows(results)
+
+        logger.info(f"Auctions urls successfully exported to {os.path.abspath(file_path)}")
+        print(f"Auctions urls successfully exported to {os.path.abspath(file_path)}")
+    except Exception as e:
+        logger.error(f"Error exporting auction urls to csv file: {e}", exc_info=True)
+        raise
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 
 
-    
-        
-
-    
