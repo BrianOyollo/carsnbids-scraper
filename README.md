@@ -1,4 +1,5 @@
 # CarsnBids_scraper
+![Static Badge](https://img.shields.io/badge/Python-3.13%2B-blue.svg) ![Static Badge](https://img.shields.io/badge/Pandas-2.3%2B-blue.svg) ![Static Badge](https://img.shields.io/badge/Selenium-4.33%2B-green.svg) ![Static Badge](https://img.shields.io/badge/SQLite-blue.svg)
 
 **carsnbids_scraper** is part of a larger data engineering project that **collects, processes, and stores car auction data** from the [Cars & Bids](https://carsandbids.com) website.
 
