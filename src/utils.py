@@ -230,8 +230,22 @@ def import_urls_from_csv(conn=None, cursor=None, file_path:str='urls.csv'):
 
 
 
-        
-# import_urls_from_csv()
-export_db_urls_to_csv()
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="CarsnBids Scraper Utilities")
+    subparsers = parser.add_subparsers(dest='action', required=True, help="What action you want to do")
 
+    # export action
+    export_parser = subparsers.add_parser('export_urls', help="Export auction urls from DB to csv file")
+    export_parser.add_argument("--file", type=str, default='auction_urls.csv', help="CSV file path to export to")
+
+    # import parser
+    import_parser = subparsers.add_parser('import_urls', help='Import auction urls from CSV to DB')
+    import_parser.add_argument("--file", type=str, default='auction_urls.csv', help="CSV file path to import from")
+
+    args = parser.parse_args()
+
+    if args.action == 'export_urls':
+        export_db_urls_to_csv(file_path=args.file)
+    elif args.action == 'import_urls':
+        import_urls_from_csv(file_path=args.file)
 
