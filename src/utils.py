@@ -130,7 +130,7 @@ def upload_to_s3(auction_data:list, bucket):
         logger.error(f"Error uploading auctions to s3 bucket: {e}")
 
 
-def export_db_urls_to_csv(file_path:str='auction_urls.csv'):
+def export_db_urls_to_csv(conn=None, cursor=None, file_path:str='auction_urls.csv'):
     """Exports all auction URLs from SQLite database to a CSV file.
     
     Retrieves URLs and their scrape timestamps from the database, then writes them
@@ -138,6 +138,9 @@ def export_db_urls_to_csv(file_path:str='auction_urls.csv'):
 
     Args:
         file_path (str, optional): Output CSV file path. Defaults to 'auction_urls.csv'.
+        conn (Optional[sqlite3.Connection]): Existing database connection. If None, creates a new one.
+        cursor (Optional[sqlite3.Cursor]): Existing database cursor. If None, creates a new one.
+
     
     Returns:
         None: Output is written to the specified CSV file.
@@ -147,12 +150,20 @@ def export_db_urls_to_csv(file_path:str='auction_urls.csv'):
     
     Notes:
         - Overwrites existing file
+        - Only closes connections it creates (won't close passed-in connections)
     """
+
+    close_conn = False
+    close_cursor = False
+
     try:
         logger.info("Exporting auction urls to csv file")
 
-        conn,cursor = db_connection(sqlite_db_path)
-
+        if conn is None and cursor is None:
+            conn,cursor = db_connection(sqlite_db_path)
+            close_conn = True
+            close_cursor = True
+        
         logger.info("Querying db for urls")
         query = "SELECT url,scraped_at FROM urls"
         results = cursor.execute(query).fetchall()
@@ -169,9 +180,58 @@ def export_db_urls_to_csv(file_path:str='auction_urls.csv'):
         logger.error(f"Error exporting auction urls to csv file: {e}", exc_info=True)
         raise
     finally:
-        if cursor:
+        if close_cursor and cursor:
             cursor.close()
-        if conn:
+        if close_conn and conn:
             conn.close()
+
+def import_urls_from_csv(conn=None, cursor=None, file_path:str='urls.csv'):
+
+    close_conn = False
+    close_cursor = False
+
+    try:
+        logger.info("Importing auction urls into db")
+
+        urls = []
+
+        # read csv file 
+        logger.info(f'Reading csv file at {os.path.abspath(file_path)}')
+        with open(file_path, "r") as file:
+            csv_reader = csv.reader(file)
+            next(csv_reader)
+
+            for row in csv_reader:
+                urls.append(row[0])
+
+        # connect to db
+        if conn is None and cursor is None:
+            conn,cursor = db_connection(sqlite_db_path)
+            close_conn = True
+            close_cursor = True
+
+        # insert urls
+        logger.info("Inserting auctions urls into db")
+        inserted = insert_urls(cursor, urls)
+        conn.commit()
+
+        logger.info(f"{inserted} urls inserted into db")
+        print(f"{inserted} urls inserted into db")
+    
+    except Exception as e:
+        logger.info(f"Error importing urls into db: {e}", exc_info=True)
+        print(f'Error importing urls.{e}')
+
+    finally:
+        if close_cursor and cursor:
+            cursor.close()
+        if close_conn and conn:
+            conn.close()
+
+
+
+        
+# import_urls_from_csv()
+export_db_urls_to_csv()
 
 
