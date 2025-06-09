@@ -28,3 +28,5 @@ wheels/
 *.db
 /src/download_objects.py
 /src/start_ec2.py
+src/trial.py
+CarsnBids_scraper.md

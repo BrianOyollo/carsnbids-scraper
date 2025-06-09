@@ -96,6 +96,20 @@ cd src/
 uv run main.py
 ```
 
+### Exporting and Importing auction urls
+
+```bash
+cd src/
+
+# export urls from db to a csv file
+uv run utils.py export  # exports to 'auction_urls.csv' at in current  dir
+uv run utils.py export --file 'path/to/csv/file'
+
+# import urls from csv to db
+uv run utils.py import # assumes there's an 'auction_urls.csv' file in current dir
+uv run utils.py import --file 'path/to/csv/file/to/import/from'
+```
+
 ---
 
 ## 📲 Notifications
