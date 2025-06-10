@@ -39,6 +39,7 @@ def run_scraper():
     ntfy_message = ''
     conn = None
     cursor = None
+    driver = None
     try:
         # setup driver
         logger.info(f"====== Setting up Webdriver ======")
