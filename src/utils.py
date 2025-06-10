@@ -27,9 +27,9 @@ def db_connection(db_path:str=None):
         logger.info("DB connection successfull")
         return conn, cursor
     except sqlite3.Error as e1:
-        logger.error(f'Error connecting to db: {e1}')
+        logger.error(f'Error connecting to db: {e1}',exc_info=True)
     except Exception as e2:
-        logger.error(f"Error: {e2}")
+        logger.error(f"Error: {e2}",exc_info=True)
 
     
 
@@ -81,7 +81,7 @@ def filter_urls(cursor, urls:list)->list:
             auction_id = url.split("/")[-2]
             auctions[auction_id]=url
         except Exception as e:
-            logger.error(f"Error processing url ({url}): {e}")
+            logger.error(f"Error processing url ({url}): {e}", exc_info=True)
             continue
     
     if not auctions:
@@ -127,7 +127,7 @@ def upload_to_s3(auction_data:list, bucket):
         s3.put_object(Bucket=bucket,Key=key, Body=json_data)
         return True
     except Exception as e:
-        logger.error(f"Error uploading auctions to s3 bucket: {e}")
+        logger.error(f"Error uploading auctions to s3 bucket: {e}", exc_info=True)
 
 
 def export_db_urls_to_csv(conn=None, cursor=None, file_path:str='auction_urls.csv'):

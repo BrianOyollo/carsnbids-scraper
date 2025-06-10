@@ -1,5 +1,5 @@
 import os
-import pandas
+import pandas as pd
 from datetime import datetime, timedelta
 import time
 from dotenv import load_dotenv
@@ -20,7 +20,7 @@ db_path = os.getenv('SQLITE_DB_PATH')
 raw_auctions_bucket = os.getenv("RAW_AUCTIONS_BUCKET")
 
 ntfy_topic = os.getenv('NTFY_TOPIC')
-ntfy_message = ''
+
 
 def run_scraper():
     """
@@ -36,6 +36,9 @@ def run_scraper():
         - Closes all resources cleanly
         - Sends notification to phone using ntfy (https://ntfy.sh/)
     """
+    ntfy_message = ''
+    conn = None
+    cursor = None
     try:
         # setup driver
         logger.info(f"====== Setting up Webdriver ======")
@@ -72,7 +75,7 @@ def run_scraper():
                 auctions_data.append(auction_data)
                 successful_urls.append(url)
             except Exception as e:
-                logger.warning(f'Error scraping {url}')
+                logger.warning(f'Error scraping {url}', exc_info=True)
 
         # insert new urls into db
         logger.info("====== Updating urls table ====== ")
@@ -100,7 +103,7 @@ def run_scraper():
                 URLs inserted into db: {inserted_rows}.\n
             """
         else:
-            logger.warning("Upload failed. New urls will not be saved in the db")
+            logger.warning("Upload failed. New urls will not be saved in the db", exc_info=True)
             ntfy_message = f"Upload to s3 failed"
 
     except Exception as e:

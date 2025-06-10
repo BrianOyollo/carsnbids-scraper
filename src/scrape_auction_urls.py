@@ -61,15 +61,15 @@ def extract_auction_urls(driver, max_pages:int, timeout:int=60*5):
 
 
         except TimeoutException:
-            logger.info("No auctions found on page.")
+            logger.info("No auctions found on page.", exc_info=True)
             break
         except Exception as e:
-            logger.error(f"Error scraping auction urls: {e}")
+            logger.error(f"Error scraping auction urls: {e}", exc_info=True)
             break
 
         # check if it has scraped max_pages
         if max_pages and current_page >= max_pages:
-            logger.info(f"Reached max pages ({max_pages}). Stopping.")
+            logger.info(f"Reached max pages ({max_pages}). Stopping.", exc_info=True)
             break
 
         # else go to the next page
@@ -81,13 +81,13 @@ def extract_auction_urls(driver, max_pages:int, timeout:int=60*5):
             current_page += 1
             time.sleep(10)
         except TimeoutException:
-            logger.warning("No more pages (or pagination button not clickable).")
+            logger.warning("No more pages (or pagination button not clickable).", exc_info=True)
             break
         except NoSuchElementException:
-            logger.error("'Next' button not found.")
+            logger.error("'Next' button not found.", exc_info=True)
             break
         except Exception as e:
-            logger.error(f"Error navigating to next page: {e}")
+            logger.error(f"Error navigating to next page: {e}", exc_info=True)
             break
 
 

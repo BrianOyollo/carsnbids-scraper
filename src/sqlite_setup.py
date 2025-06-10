@@ -31,11 +31,7 @@ def init_db(db_path:str=None):
         logger.info('URLs table successfully created')
         conn.commit()
     except Exception as e:
-        logger.error("Error creating urls table")
-        logger.error(e)
+        logger.error(f"Error creating urls table: {e}", exc_info=True)
     finally:
         cur.close()
         conn.close()
-
-
-init_db()
