@@ -69,6 +69,7 @@ def scrape_auction_data(driver, url:str, timeout:int = 60) -> dict:
             'bullet_points': []
         },
         'known_flaws': [],
+        'modifications':[],
         'service_history': {
             'description': None,
             'items': []
@@ -237,6 +238,16 @@ def scrape_auction_data(driver, url:str, timeout:int = 60) -> dict:
             auction_data['known_flaws'] = [item.text.strip() for item in flaws_items]
         except NoSuchElementException:
             logger.warning('Known flaws not found', exc_info=True)
+        except Exception as e:
+            logger.warning(e, exc_info=True)
+
+        # extract modificatios
+        try:
+            mod_section = driver.find_element(By.CSS_SELECTOR, ".detail-section.detail-modifications")
+            mod_items = mod_section.find_elements(By.CSS_SELECTOR, ".detail-body li")
+            auction_data['modifications'] = [item.text.strip() for item in mod_items]
+        except NoSuchElementException:
+            logger.warning('Modifications not found', exc_info=True)
         except Exception as e:
             logger.warning(e, exc_info=True)
 
