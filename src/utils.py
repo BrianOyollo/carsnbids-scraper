@@ -105,7 +105,7 @@ def filter_urls(cursor, urls:list)->list:
 
 
 
-def upload_to_s3(auction_data:list, bucket):
+def upload_to_s3(s3_client, auction_data:list, bucket):
     """
     Uploads auction data to an S3 bucket as a JSON file.
 
@@ -123,8 +123,7 @@ def upload_to_s3(auction_data:list, bucket):
     json_data = json.dumps(auction_data, indent=3)
     try:
         logger.info('Uploading auctions to s3')
-        s3 = boto3.client("s3")
-        s3.put_object(Bucket=bucket,Key=key, Body=json_data)
+        s3_client.put_object(Bucket=bucket,Key=key, Body=json_data)
         return True
     except Exception as e:
         logger.error(f"Error uploading auctions to s3 bucket: {e}", exc_info=True)
@@ -228,6 +227,31 @@ def import_urls_from_csv(conn=None, cursor=None, file_path:str='urls.csv'):
         if close_conn and conn:
             conn.close()
 
+
+def start_instance(ec2_client, instance_id:str):
+    """
+    Start ec2 instance
+
+    Args:
+        instance_id (str): _description_
+    """
+    try:
+        ec2_client.start_instances(InstanceIds=[instance_id])
+    except Exception as e:
+        logger.warning(f"Error starting ec2 instance: {e}", exc_info=True)
+
+
+def stop_instance(ec2_client, instance_id:str):
+    """
+    Stop ec2 instance
+
+    Args:
+        instance_id (str): _description_
+    """
+    try:
+        ec2_client.stop_instances(InstanceIds=[instance_id])
+    except Exception as e:
+        logger.warning(f"Error terminating ec2 instance: {e}", exc_info=True)
 
 
 if __name__ == "__main__":

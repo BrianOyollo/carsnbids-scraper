@@ -4,11 +4,13 @@ from datetime import datetime, timedelta
 import time
 from dotenv import load_dotenv
 from logger import setup_json_logger
+import boto3
 import driver_setup
 import scrape_auction_urls
 import scrape_auction
 import utils
 import notify
+
 
 
 load_dotenv()
@@ -18,6 +20,7 @@ today = datetime.now().date()
 max_pages = os.getenv('MAX_PAGES_TO_SCRAPE')
 db_path = os.getenv('SQLITE_DB_PATH')
 raw_auctions_bucket = os.getenv("RAW_AUCTIONS_BUCKET")
+ec2_instance_id = os.getenv('EC2_INSTANCE_ID')
 
 ntfy_topic = os.getenv('NTFY_TOPIC')
 
@@ -40,6 +43,7 @@ def run_scraper():
     conn = None
     cursor = None
     driver = None
+
     try:
         # setup driver
         logger.info(f"====== Setting up Webdriver ======")
@@ -48,6 +52,11 @@ def run_scraper():
         # setup db connection
         logger.info("====== Setting up db connection ======")
         conn, cursor = utils.db_connection(db_path)
+
+        # aws connections
+        s3_client = boto3.client("s3")
+        ec2_client = boto3.client("ec2")
+
 
         # scrape daily urls
         logger.info('====== Scraping daily urls ===== ')
@@ -62,6 +71,16 @@ def run_scraper():
         # filter out url
         logger.info("====== Filtering out urls ====== ")
         new_urls = utils.filter_urls(cursor, daily_urls)
+
+        if not new_urls:
+            logger.info("No new auctions found. Shutting down instance.")
+            ntfy_message = "No new auctions today. Instance will shut down."
+            notify.send_notification(ntfy_topic, ntfy_message)
+
+            utils.stop_instance(ec2_client, ec2_instance_id)
+            
+            return
+
 
         # scrape auction details
         logger.info('====== Scraping auction_details ======')
@@ -83,7 +102,7 @@ def run_scraper():
         inserted_rows = utils.insert_urls(cursor,successful_urls)
 
         # upload auctions to s3
-        uploaded = utils.upload_to_s3(auctions_data, raw_auctions_bucket)
+        uploaded = utils.upload_to_s3(s3_client, auctions_data, raw_auctions_bucket)
 
         if uploaded:
             # committ & close db connection
