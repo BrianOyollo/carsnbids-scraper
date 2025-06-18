@@ -102,12 +102,12 @@ uv run main.py
 cd src/
 
 # export urls from db to a csv file
-uv run utils.py export  # exports to 'auction_urls.csv' at in current  dir
-uv run utils.py export --file 'path/to/csv/file'
+uv run utils.py export_urls  # exports to 'auction_urls.csv' at in current  dir
+uv run utils.py export_urls --file 'path/to/csv/file'
 
 # import urls from csv to db
-uv run utils.py import # assumes there's an 'auction_urls.csv' file in current dir
-uv run utils.py import --file 'path/to/csv/file/to/import/from'
+uv run utils.py import_urls # assumes there's an 'auction_urls.csv' file in current dir
+uv run utils.py import_urls --file 'path/to/csv/file/to/import/from'
 ```
 
 ---
@@ -146,4 +146,4 @@ It is **not affiliated with carsandbids.com.**
 
 ## 📬 Contact
 
-Have questions or feedback? Reach out at [oyollobrian@gmail.com](oyollobrian@gmail.com)
+Have questions or feedback? Reach out at oyollobrian@gmail.com
