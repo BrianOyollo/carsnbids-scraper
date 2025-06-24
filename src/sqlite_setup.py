@@ -35,3 +35,5 @@ def init_db(db_path:str=None):
     finally:
         cur.close()
         conn.close()
+
+init_db(db_path)
